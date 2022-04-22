@@ -1,0 +1,112 @@
+CREATE TABLE sale ( 
+	sales_type	CHAR(25)	NOT NULL,
+	sales_id	INTEGER	NOT NULL,
+	reduced_price	REAL,
+PRIMARY KEY (sales_id) );
+
+CREATE TABLE product_id (
+	barcode	INTEGER	NOT NULL,
+	name	CHAR(25)	NOT NULL,
+PRIMARY KEY (barcode),
+UNIQUE (name) );
+
+CREATE TABLE product_info ( 
+	FK1_name	CHAR(25)	NOT NULL,
+	selling_price	REAL	NOT NULL,
+	available_items	INTEGER	NOT NULL,
+	providers_price	REAL	NOT NULL,
+	exp_date	DATE,
+	type	CHAR(25),
+	FK1_sections_name	CHAR(25)	NOT NULL,
+PRIMARY KEY (FK1_name) );
+
+CREATE TABLE duration ( 
+	duration_id	INTEGER	NOT NULL,
+	from	DATE	NOT NULL,
+	until	DATE	NOT NULL,
+PRIMARY KEY (duration_id) );
+
+CREATE TABLE shipment_details ( 
+	arrival_time	TIME	NOT NULL,
+	shipment_id	INTEGER	NOT NULL,
+	arrival_date	DATE	NOT NULL,
+PRIMARY KEY (shipment_id) );
+
+CREATE TABLE employees ( 
+	employee_id	INTEGER	NOT NULL,
+	name	CHAR(25),
+	contact_number	INTEGER	NOT NULL,
+PRIMARY KEY (employee_id) );
+
+CREATE TABLE section ( 
+	sections_name	CHAR(25)	NOT NULL,
+PRIMARY KEY (sections_name) );
+
+CREATE TABLE provider ( 
+	location	CHAR(25),
+	provider's_name	CHAR(25)	NOT NULL,
+PRIMARY KEY (provider's_name) );
+
+CREATE TABLE shift ( 
+	date	DATE	NOT NULL,
+	shift_id	INTEGER	NOT NULL,
+	end	TIME	NOT NULL,
+	start	TIME	NOT NULL,
+PRIMARY KEY (shift_id) );
+
+CREATE TABLE IS_ON ( 
+	FK1_duration_id	INTEGER	NOT NULL,
+	FK2_barcode	INTEGER	NOT NULL,
+	FK3_sales_id	INTEGER	NOT NULL,
+PRIMARY KEY (FK2_barcode) );
+
+CREATE TABLE WORKING ( 
+	FK1_sections_name	CHAR(25)	NOT NULL,
+	FK2_employee_id	INTEGER	NOT NULL,
+	FK3_shift_id	INTEGER	NOT NULL,
+PRIMARY KEY (FK1_sections_name, FK2_employee_id, FK3_shift_id) );
+
+CREATE TABLE SHIPMENT ( 
+	FK1_barcode	INTEGER	NOT NULL,
+	FK2_provider's_name	CHAR(25)	NOT NULL,
+	FK3_shipment_id	INTEGER	NOT NULL,
+PRIMARY KEY (FK1_barcode) );
+
+CREATE TABLE brand_storage ( 
+	rating	INTEGER,
+UNIQUE (provider's_name)
+) INHERITS (provider);
+
+CREATE TABLE local_provider ( 
+	contract_until	DATE,
+	contract_since	DATE,
+UNIQUE (provider's_name)
+) INHERITS (provider);
+
+CREATE TABLE international_provider ( 
+	contract_until	DATE,
+	contract_since	DATE,
+	country	CHAR(25),
+UNIQUE (provider's_name)
+) INHERITS (provider);
+
+ALTER TABLE product ADD FOREIGN KEY (FK1_sections_name) REFERENCES section (sections_name) ON DELETE SET NULL ON UPDATE CASCADE;
+
+ALTER TABLE IS_ON ADD FOREIGN KEY (FK1_duration_id) REFERENCES duration (duration_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE IS_ON ADD FOREIGN KEY (FK2_barcode) REFERENCES product_id (barcode) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE IS_ON ADD FOREIGN KEY (FK3_sales_id) REFERENCES sale (sales_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE WORKING ADD FOREIGN KEY (FK1_sections_name) REFERENCES section (sections_name) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE WORKING ADD FOREIGN KEY (FK2_employee_id) REFERENCES employees (employee_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE WORKING ADD FOREIGN KEY (FK3_shift_id) REFERENCES shift (shift_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE SHIPMENT ADD FOREIGN KEY (FK1_barcode) REFERENCES product_id (barcode) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE SHIPMENT ADD FOREIGN KEY (FK2_provider's_name) REFERENCES provider (provider's_name) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE SHIPMENT ADD FOREIGN KEY (FK3_shipment_id) REFERENCES shipment_details (shipment_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
